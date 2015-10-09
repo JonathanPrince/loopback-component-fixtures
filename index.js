@@ -1,10 +1,11 @@
 var fs =  require('fs');
+var path = require('path');
 var async = require('async');
 var loopback = require('loopback');
 var merge = require('merge');
 
-function loadFixtures(models, path, callback) {
-  var fixturePath = process.cwd() + path;
+function loadFixtures(models, fixturesPath, callback) {
+  var fixturePath = path.join(process.cwd(), fixturesPath);
   var fixtures = fs.readdirSync(fixturePath);
 
   function loadFixture(fixture, done){
@@ -21,26 +22,32 @@ module.exports = function setupTestFixtures(app, options) {
   options = merge({
     loadFixturesOnStartup: false,
     environments: 'test',
-    fixturePath: '/server/test-fixtures/'
+    fixturesPath: '/server/test-fixtures/',
+    datasource: 'db'
   }, options);
 
   if (options.environments.indexOf(process.env.NODE_ENV) === -1) return;
 
   if (options.loadFixturesOnStartup){
-    loadFixtures(app.models, options.fixturePath, function(err){
+    loadFixtures(app.models, options.fixturesPath, function(err){
       if (err) console.log(err);
     });
   }
 
-  var Fixtures = app.model('fixtures', {dataSource: 'db'});
+  var Fixtures = app.model('fixtures', {
+    dataSource: options.datasource,
+    base: 'Model'
+  });
 
-  Fixtures.setupFixtures = app.setupFixtures = function(options, callback){
-    loadFixtures(app.models, function(){
+  Fixtures.setupFixtures = app.setupFixtures = function(opts, callback){
+    if (!callback) callback = opts;
+    loadFixtures(app.models, options.fixturesPath, function(){
       callback(null, 'setup complete');
     });
   };
 
-  Fixtures.teardownFixtures = app.teardownFixtures = function(options, callback){
+  Fixtures.teardownFixtures = app.teardownFixtures = function(opts, callback){
+    if (!callback) callback = opts;
     var dataSourceNames = Object.keys(app.datasources);
     dataSourceNames.forEach(function(dataSourceName){
       app.datasources[dataSourceName].automigrate();
