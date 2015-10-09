@@ -25,7 +25,7 @@ handle fixtures for testing clients against
 
   The default location is `/server/test-fixtures`. This can be set in `component-config.json` (see below)
 
-5. Create `datasources.{env}.json` file. This is the datasources definition that will be used depending on the value of NODE_ENV wher you want to use fixture data. Example:
+5. Create `datasources.{env}.json` file. This is the datasources definition that will be used depending on the value of NODE_ENV where you want to use fixture data. Example:
   ```json
   {
     "db": {
