@@ -4,8 +4,18 @@
   "description": "Adds fixture data to loopback",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter=spec ./test/**/*"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonathanPrince/loopback-component-fixtures"
+  },
+  "keywords": [
+    "loopback",
+    "component",
+    "fixtures",
+    "testing"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
