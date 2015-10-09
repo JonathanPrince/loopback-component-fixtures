@@ -54,3 +54,7 @@ Options:
  - `datasource`
 
   [String] : The name of the datasource specified in `datasources.{env}.json` *(default: 'db')*
+
+**Fixture Files**
+
+Fixtures are stored in .json files and should have the same name as the loopback model definitions they correspond to. The content should be either an object (for a single item) or an array of objects for multiple items.
