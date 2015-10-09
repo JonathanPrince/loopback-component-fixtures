@@ -9,7 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "async": "^1.4.2",
     "loopback": "^2.22.2",
-    "loopback-datasource-juggler": "^2.41.0"
+    "loopback-datasource-juggler": "^2.41.0",
+    "merge": "^1.2.0"
   }
 }

@@ -1,10 +1,10 @@
 var fs =  require('fs');
 var async = require('async');
 var loopback = require('loopback');
+var merge = require('merge');
 
-function loadFixtures(models, callback) {
-  console.log('load fixtures');
-  var fixturePath = __dirname + '/../test-fixtures/';
+function loadFixtures(models, path, callback) {
+  var fixturePath = process.cwd() + path;
   var fixtures = fs.readdirSync(fixturePath);
 
   function loadFixture(fixture, done){
@@ -16,20 +16,31 @@ function loadFixtures(models, callback) {
   async.each(fixtures, loadFixture, callback);
 }
 
-function setupTestFixtures(app) {
+module.exports = function setupTestFixtures(app, options) {
 
-  loadFixtures(app.models, function(err){
-    if (err) console.log(err);
-  });
+  options = merge({
+    loadFixturesOnStartup: false,
+    environments: 'test',
+    fixturePath: '/server/test-fixtures/'
+  }, options);
 
-  var Test = app.model('test', {dataSource: 'db'});
+  if (options.environments.indexOf(process.env.NODE_ENV) === -1) return;
 
-  Test.setupFixtures = app.setupFixtures = function(options, callback){
-    loadFixtures(app.models, callback);
+  if (options.loadFixturesOnStartup){
+    loadFixtures(app.models, options.fixturePath, function(err){
+      if (err) console.log(err);
+    });
+  }
+
+  var Fixtures = app.model('fixtures', {dataSource: 'db'});
+
+  Fixtures.setupFixtures = app.setupFixtures = function(options, callback){
+    loadFixtures(app.models, function(){
+      callback(null, 'setup complete');
+    });
   };
 
-  Test.teardownFixtures = app.teardownFixtures = function(options, callback){
-    console.log('teardown fixtures');
+  Fixtures.teardownFixtures = app.teardownFixtures = function(options, callback){
     var dataSourceNames = Object.keys(app.datasources);
     dataSourceNames.forEach(function(dataSourceName){
       app.datasources[dataSourceName].automigrate();
@@ -37,16 +48,16 @@ function setupTestFixtures(app) {
     callback(null, 'teardown complete');
   };
 
-  Test.remoteMethod('setupFixtures', {
-    description: 'Setup fixtures for testing',
+  Fixtures.remoteMethod('setupFixtures', {
+    description: 'Setup fixtures',
+    returns: {arg: 'fixtures', type: 'string'},
     http: {path: '/setup', verb: 'get'}
   });
 
-  Test.remoteMethod('teardownFixtures', {
-    description: 'Teardown test fixtures',
+  Fixtures.remoteMethod('teardownFixtures', {
+    description: 'Teardown fixtures',
+    returns: {arg: 'fixtures', type: 'string'},
     http: {path: '/teardown', verb: 'get'}
   });
 
-}
-
-module.exports = (process.env.NODE_ENV === 'test')? setupTestFixtures: function(){};
+};
