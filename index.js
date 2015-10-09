@@ -24,11 +24,11 @@ function setupTestFixtures(app) {
 
   var Test = app.model('test', {dataSource: 'db'});
 
-  Test.setupFixtures = app.setupFixtures function(options, callback){
+  Test.setupFixtures = app.setupFixtures = function(options, callback){
     loadFixtures(app.models, callback);
   };
 
-  Test.teardownFixtures = app.teardownFixtures function(options, callback){
+  Test.teardownFixtures = app.teardownFixtures = function(options, callback){
     console.log('teardown fixtures');
     var dataSourceNames = Object.keys(app.datasources);
     dataSourceNames.forEach(function(dataSourceName){

@@ -1,6 +1,6 @@
 {
   "name": "loopback-component-fixtures",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Adds fixture data to loopback",
   "main": "index.js",
   "scripts": {
