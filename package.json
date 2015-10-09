@@ -1,0 +1,15 @@
+{
+  "name": "loopback-component-fixtures",
+  "version": "1.0.0",
+  "description": "Adds fixture data to loopback",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "loopback": "^2.22.2",
+    "loopback-datasource-juggler": "^2.41.0"
+  }
+}
