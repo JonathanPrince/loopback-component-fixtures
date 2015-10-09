@@ -11,12 +11,12 @@ handle fixtures for testing clients against
 
 2. Create a component-config.json file in your server folder (if you don't already have one)
 
-3. Configure options inside `component-config.json`
+3. Configure options inside `component-config.json`. *(see configuration section)*
 
   ```json
   {
     "loopback-component-fixtures": {
-      // options here as key value pairs
+      "{option}": "{value}"
     }
   }
   ```
