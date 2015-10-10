@@ -49,7 +49,7 @@ Options:
 
  - `fixturesPath`
 
-  [String] : The location of of the fixture definitions. *(default: '/server/test-fixtures/')*
+  [String] : The location of of the fixture definitions relative to the project root. *(default: '/server/test-fixtures/')*
 
  - `datasource`
 
