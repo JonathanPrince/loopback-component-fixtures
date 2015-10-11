@@ -61,6 +61,6 @@ Fixtures are stored in .json files and should have the same name as the loopback
 
 **Setup/Teardown Fixtures**
 
-Fixtures can be setup at startup by setting `loadFixturesOnStartup` to `true` in the component-config file. The fixtures can be setup manually by making a GET request to the endpoint `<your-api-route>/fixtures/setup` and a GET request to `<your-api-route>/fixtures/teardown` will clear all data.
+Fixtures can be setup at startup by setting `loadFixturesOnStartup` to `true` in the component-config file. The fixtures can be setup manually by making a GET request to the endpoint `<api-root>/fixtures/setup` and a GET request to `<api-root>/fixtures/teardown` will clear all data.
 
 These actions are also available on the server as `app.setupFixtures(callback)` and `app.teardownFixtures(callback)`.
