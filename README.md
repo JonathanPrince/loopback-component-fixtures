@@ -1,5 +1,5 @@
 # loopback-component-fixtures
-handle fixtures for testing clients against
+This component was conceived by the desire to test client side applications without needing to mock API requests. It doesn't make sense to mock an API when Loopback is already being used. Environment specific datasource configurations were already available, the only piece missing was an easy way to add and remove fixtures when required. Hopefully this component will be useful for others as well, if you have any suggestions to improve the usefulness of this component please let me know, or even better feel free to submit a pull request.
 
 # Usage
 
