@@ -22,8 +22,7 @@ module.exports = function setupTestFixtures(app, options) {
   options = merge({
     loadFixturesOnStartup: false,
     environments: 'test',
-    fixturesPath: '/server/test-fixtures/',
-    datasource: 'db'
+    fixturesPath: '/server/test-fixtures/'
   }, options);
 
   if (options.environments.indexOf(process.env.NODE_ENV) === -1) return;
@@ -35,7 +34,7 @@ module.exports = function setupTestFixtures(app, options) {
   }
 
   var Fixtures = app.model('fixtures', {
-    dataSource: options.datasource,
+    dataSource: false,
     base: 'Model'
   });
 
