@@ -51,9 +51,6 @@ Options:
 
   [String] : The location of of the fixture definitions relative to the project root. *(default: '/server/test-fixtures/')*
 
- - `datasource`
-
-  [String] : The name of the datasource specified in `datasources.{env}.json` *(default: 'db')*
 
 **Fixture Files**
 
