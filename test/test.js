@@ -36,7 +36,10 @@ describe('loopback fixtures component', function () {
 
   describe('setting loadFixturesOnStartup: true', function () {
     it('should load fixtures on startup ', function(done){
-      var options = { "loadFixturesOnStartup": true };
+      var options = {
+        "loadFixturesOnStartup": true,
+        "fixturesPath": "test/test-fixtures/"
+      };
       fixturesComponent(app, options);
       request(app).get('/items')
         .expect(200)
