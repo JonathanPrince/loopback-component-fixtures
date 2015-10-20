@@ -4,7 +4,7 @@
   "description": "Component for handling fixture data for client side tests",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test/**/*.js"
+    "test": "NODE_ENV=test mocha ./test/**/*.js"
   },
   "repository": {
     "type": "git",
