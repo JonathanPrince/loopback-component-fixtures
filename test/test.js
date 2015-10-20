@@ -21,7 +21,7 @@ describe('loopback fixtures component', function () {
 
   describe('when using defaults', function () {
     it('shouldn\'t load fixtures on startup ', function(done){
-      options = {};
+      var options = {};
       fixturesComponent(app, options);
       request(app).get('/items')
         .expect(200)
@@ -29,6 +29,21 @@ describe('loopback fixtures component', function () {
           expect(err).to.equal(null);
           expect(res.body).to.be.an('Array');
           expect(res.body.length).to.equal(0);
+          done();
+        });
+    });
+  });
+
+  describe('setting loadFixturesOnStartup: true', function () {
+    it('should load fixtures on startup ', function(done){
+      var options = { "loadFixturesOnStartup": true };
+      fixturesComponent(app, options);
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res){
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(1);
           done();
         });
     });
