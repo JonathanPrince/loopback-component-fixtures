@@ -1,6 +1,6 @@
 {
   "name": "loopback-component-fixtures",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Component for handling fixture data for client side tests",
   "main": "index.js",
   "scripts": {
