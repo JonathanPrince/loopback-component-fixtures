@@ -1,3 +1,4 @@
 [
-  {"name": "Test Name", "description": "Describes this item."}
+  {"name": "First Item Name", "description": "Describes the first item."},
+  {"name": "Second Item Name", "description": "Describes the second item."}
 ]

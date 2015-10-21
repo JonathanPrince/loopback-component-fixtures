@@ -46,7 +46,7 @@ describe('loopback fixtures component', function () {
         .end(function(err, res){
           expect(err).to.equal(null);
           expect(res.body).to.be.an('Array');
-          expect(res.body.length).to.equal(1);
+          expect(res.body.length).to.equal(2);
           done();
         });
     });
@@ -79,7 +79,7 @@ describe('loopback fixtures component', function () {
           .end(function(err, res){
             expect(err).to.equal(null);
             expect(res.body).to.be.an('Array');
-            expect(res.body.length).to.equal(1);
+            expect(res.body.length).to.equal(2);
             done();
           });
       });
