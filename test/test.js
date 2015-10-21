@@ -51,4 +51,38 @@ describe('loopback fixtures component', function () {
         });
     });
   });
+
+  describe('a GET request to /fixtures/setup', function () {
+    it('should return success message', function(done){
+      var options = {
+        "fixturesPath": "test/test-fixtures/"
+      };
+      fixturesComponent(app, options);
+      request(app).get('/fixtures/setup')
+        .expect(200)
+        .end(function(err, res){
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Object');
+          expect(res.body).to.deep.equal({"fixtures": "setup complete"});
+          done();
+        });
+    });
+
+    it('should load fixtures', function(done){
+      var options = {
+        "fixturesPath": "test/test-fixtures/"
+      };
+      fixturesComponent(app, options);
+      request(app).get('/fixtures/setup').end(function(){
+        request(app).get('/items')
+          .expect(200)
+          .end(function(err, res){
+            expect(err).to.equal(null);
+            expect(res.body).to.be.an('Array');
+            expect(res.body.length).to.equal(1);
+            done();
+          });
+      });
+    });
+  });
 });
