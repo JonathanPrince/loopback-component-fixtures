@@ -48,10 +48,14 @@ module.exports = function setupTestFixtures(app, options) {
   Fixtures.teardownFixtures = app.teardownFixtures = function(opts, callback){
     if (!callback) callback = opts;
     var dataSourceNames = Object.keys(app.datasources);
-    dataSourceNames.forEach(function(dataSourceName){
-      app.datasources[dataSourceName].automigrate();
+    var migrateDataSource = function(dataSourceName, done){
+      app.datasources[dataSourceName].automigrate(function(){
+        done();
+      });
+    };
+    async.each(dataSourceNames, migrateDataSource, function(){
+      callback(null, 'teardown complete');
     });
-    callback(null, 'teardown complete');
   };
 
   Fixtures.remoteMethod('setupFixtures', {
