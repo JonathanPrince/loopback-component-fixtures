@@ -110,7 +110,8 @@ describe('loopback fixtures component', function () {
         };
         fixturesComponent(app, options);
         request(app).get('/fixtures/teardown')
-          .end(function () {
+          .end(function (err, res) {
+            expect(err).to.equal(null);
             app.models.Item.find(function(err, data){
               expect(data.length).to.equal(0);
               done();
