@@ -1,0 +1,3 @@
+[
+  {"name": "Not to be loaded", "description": "This shouldn't be loaded."}
+]
