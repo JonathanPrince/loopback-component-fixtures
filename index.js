@@ -6,7 +6,10 @@ var merge = require('merge');
 
 function loadFixtures(models, fixturesPath, callback) {
   var fixturePath = path.join(process.cwd(), fixturesPath);
-  var fixtures = fs.readdirSync(fixturePath);
+  var fixtureFolderContents = fs.readdirSync(fixturePath);
+  var fixtures = fixtureFolderContents.filter(function(fileName){
+    return fileName.match(/\.json$/);
+  });
 
   function loadFixture(fixture, done){
     var fixtureName = fixture.replace('.json', '');

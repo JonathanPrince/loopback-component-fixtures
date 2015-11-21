@@ -50,6 +50,20 @@ describe('loopback fixtures component', function () {
           done();
         });
     });
+
+    it('shouldn\'t load files without .json extension', function(done){
+      var options = {
+        "loadFixturesOnStartup": true,
+        "fixturesPath": "test/test-fixtures/"
+      };
+      fixturesComponent(app, options);
+      request(app).get('/DontLoadThis')
+        .expect(404)
+        .end(function(err, res){
+          expect(err).to.equal(null);
+          done();
+        });
+    });
   });
 
   describe('fixtures endpoints', function(){
