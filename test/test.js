@@ -5,8 +5,8 @@ var fixturesComponent = require('../');
 var app;
 var Item;
 
-describe('loopback fixtures component', function () {
-  beforeEach(function(){
+describe('loopback fixtures component', function() {
+  beforeEach(function() {
     app = loopback();
     app.set('legacyExplorer', false);
     var dataSource = loopback.createDataSource('memory');
@@ -19,13 +19,13 @@ describe('loopback fixtures component', function () {
     app.use(loopback.rest());
   });
 
-  describe('when using defaults', function () {
-    it('shouldn\'t load fixtures on startup ', function(done){
+  describe('when using defaults', function() {
+    it('shouldn\'t load fixtures on startup ', function(done) {
       var options = {};
       fixturesComponent(app, options);
       request(app).get('/items')
         .expect(200)
-        .end(function(err, res){
+        .end(function(err, res) {
           expect(err).to.equal(null);
           expect(res.body).to.be.an('Array');
           expect(res.body.length).to.equal(0);
@@ -34,16 +34,16 @@ describe('loopback fixtures component', function () {
     });
   });
 
-  describe('setting loadFixturesOnStartup: true', function () {
-    it('should load fixtures on startup ', function(done){
+  describe('setting loadFixturesOnStartup: true', function() {
+    it('should load fixtures on startup ', function(done) {
       var options = {
-        "loadFixturesOnStartup": true,
-        "fixturesPath": "test/test-fixtures/"
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/'
       };
       fixturesComponent(app, options);
       request(app).get('/items')
         .expect(200)
-        .end(function(err, res){
+        .end(function(err, res) {
           expect(err).to.equal(null);
           expect(res.body).to.be.an('Array');
           expect(res.body.length).to.equal(2);
@@ -51,47 +51,91 @@ describe('loopback fixtures component', function () {
         });
     });
 
-    it('shouldn\'t load files without .json extension', function(done){
+    it('shouldn\'t load in start fixtures because of wrong environment', function(done) {
+
+      app.settings.env = 'env';
+
       var options = {
-        "loadFixturesOnStartup": true,
-        "fixturesPath": "test/test-fixtures/"
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/',
+        'environments': 'wrong_env'
+      };
+
+      fixturesComponent(app, options);
+
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(0);
+          done();
+        });
+    });
+
+    it('should load in start fixtures because of env matches', function(done) {
+
+      app.settings.env = 'env';
+
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/',
+        'environments': 'env'
+      };
+
+      fixturesComponent(app, options);
+
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(2);
+          done();
+        });
+    });
+
+    it('shouldn\'t load files without .json extension', function(done) {
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/'
       };
       fixturesComponent(app, options);
       request(app).get('/DontLoadThis')
         .expect(404)
-        .end(function(err, res){
+        .end(function(err, res) {
           expect(err).to.equal(null);
           done();
         });
     });
   });
 
-  describe('fixtures endpoints', function(){
-    describe('a GET request to /fixtures/setup', function () {
-      it('should return success message', function(done){
+  describe('fixtures endpoints', function() {
+    describe('a GET request to /fixtures/setup', function() {
+      it('should return success message', function(done) {
         var options = {
-          "fixturesPath": "test/test-fixtures/"
+          'fixturesPath': 'test/test-fixtures/'
         };
         fixturesComponent(app, options);
         request(app).get('/fixtures/setup')
           .expect(200)
-          .end(function(err, res){
+          .end(function(err, res) {
             expect(err).to.equal(null);
             expect(res.body).to.be.an('Object');
-            expect(res.body).to.deep.equal({"fixtures": "setup complete"});
+            expect(res.body).to.deep.equal({'fixtures': 'setup complete'});
             done();
           });
       });
 
-      it('should load fixtures', function(done){
+      it('should load fixtures', function(done) {
         var options = {
-          "fixturesPath": "test/test-fixtures/"
+          'fixturesPath': 'test/test-fixtures/'
         };
         fixturesComponent(app, options);
-        request(app).get('/fixtures/setup').end(function(){
+        request(app).get('/fixtures/setup').end(function() {
           request(app).get('/items')
             .expect(200)
-            .end(function(err, res){
+            .end(function(err, res) {
               expect(err).to.equal(null);
               expect(res.body).to.be.an('Array');
               expect(res.body.length).to.equal(2);
@@ -101,36 +145,36 @@ describe('loopback fixtures component', function () {
       });
     });
 
-    describe('a GET request to /fixtures/teardown', function () {
-      it('should return success message', function(done){
+    describe('a GET request to /fixtures/teardown', function() {
+      it('should return success message', function(done) {
         var options = {
-          "fixturesPath": "test/test-fixtures/"
+          'fixturesPath': 'test/test-fixtures/'
         };
         fixturesComponent(app, options);
         request(app).get('/fixtures/teardown')
           .expect(200)
-          .end(function (err, res) {
+          .end(function(err, res) {
             expect(err).to.equal(null);
             expect(res.body).to.be.an('Object');
-            expect(res.body).to.deep.equal({"fixtures": "teardown complete"});
+            expect(res.body).to.deep.equal({'fixtures': 'teardown complete'});
             done();
           });
       });
 
-      it('should teardown fixtures', function(done){
+      it('should teardown fixtures', function(done) {
         var options = {
-          "loadFixturesOnStartup": true,
-          "fixturesPath": "test/test-fixtures/"
+          'loadFixturesOnStartup': true,
+          'fixturesPath': 'test/test-fixtures/'
         };
         fixturesComponent(app, options);
         request(app).get('/fixtures/teardown')
-          .end(function (err, res) {
+          .end(function(err, res) {
             expect(err).to.equal(null);
-            app.models.Item.find(function(err, data){
+            app.models.Item.find(function(err, data) {
               expect(data.length).to.equal(0);
               done();
             });
-        });
+          });
       });
     });
   });
