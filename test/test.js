@@ -9,12 +9,18 @@ describe('loopback fixtures component', function() {
   beforeEach(function() {
     app = loopback();
     app.set('legacyExplorer', false);
-    var dataSource = loopback.createDataSource('memory');
+
+    var dataSource = app.dataSource('db', {
+      name: 'db',
+      connector: 'memory'
+    });
+
     Item = dataSource.createModel('item', {
       id: {type: Number, id: true},
       name: String,
       description: String
     });
+
     app.model(Item);
     app.use(loopback.rest());
   });
