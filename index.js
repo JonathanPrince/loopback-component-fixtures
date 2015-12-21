@@ -32,7 +32,7 @@ module.exports = function setupTestFixtures(app, options) {
     ? app.settings.env : process.env.NODE_ENV;
 
   var match = Array.isArray(options.environments)
-    ? include.indexOf(environment) !== -1
+    ? options.environments.indexOf(environment) !== -1
     : environment === options.environments;
 
   if (!match) {

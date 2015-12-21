@@ -101,6 +101,28 @@ describe('loopback fixtures component', function() {
         });
     });
 
+    it('should load in start fixtures because of env matches (as array)', function(done) {
+
+      app.settings.env = 'env';
+
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/',
+        'environments': ['env']
+      };
+
+      fixturesComponent(app, options);
+
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(2);
+          done();
+        });
+    });
+
     it('shouldn\'t load files without .json extension', function(done) {
       var options = {
         'loadFixturesOnStartup': true,
