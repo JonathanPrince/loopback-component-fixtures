@@ -28,7 +28,16 @@ module.exports = function setupTestFixtures(app, options) {
     fixturesPath: '/server/test-fixtures/'
   }, options);
 
-  if (options.environments.indexOf(process.env.NODE_ENV) === -1) return;
+  var environment = app.settings && app.settings.env
+    ? app.settings.env : process.env.NODE_ENV;
+
+  var match = Array.isArray(options.environments)
+    ? options.environments.indexOf(environment) !== -1
+    : environment === options.environments;
+
+  if (!match) {
+    return;
+  }
 
   if (options.loadFixturesOnStartup){
     loadFixtures(app.models, options.fixturesPath, function(err){
