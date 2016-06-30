@@ -4,17 +4,27 @@ var async = require('async');
 var loopback = require('loopback');
 var merge = require('merge');
 
-function loadFixtures(models, fixturesPath, callback) {
-  var fixturePath = path.join(process.cwd(), fixturesPath);
-  var fixtureFolderContents = fs.readdirSync(fixturePath);
-  var fixtures = fixtureFolderContents.filter(function(fileName){
-    return fileName.match(/\.json$/);
-  });
+var fixtures;
+var cachedFixtures;
 
+function loadFixtures(models, fixturesPath, callback) {
   function loadFixture(fixture, done){
+    if (!cachedFixtures[fixture]) {
+      var fixtureData = require(fixturePath + fixture);
+      cachedFixtures[fixture] = fixtureData;
+    }
+
     var fixtureName = fixture.replace('.json', '');
-    var fixtureData = require(fixturePath + fixture);
-    models[fixtureName].create(fixtureData, done);
+    models[fixtureName].create(cachedFixtures[fixture], done);
+  }
+
+  if (!cachedFixtures) {
+    cachedFixtures = {}
+    var fixturePath = path.join(process.cwd(), fixturesPath);
+    var fixtureFolderContents = fs.readdirSync(fixturePath);
+    fixtures = fixtureFolderContents.filter(function(fileName){
+      return fileName.match(/\.json$/);
+    });
   }
 
   async.each(fixtures, loadFixture, callback);
