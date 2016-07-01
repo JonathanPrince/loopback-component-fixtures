@@ -69,12 +69,35 @@ module.exports = function setupTestFixtures(app, options) {
 
   Fixtures.teardownFixtures = app.teardownFixtures = function(opts, callback){
     if (!callback) callback = opts;
+
     var dataSourceNames = Object.keys(app.datasources);
+
     var migrateDataSource = function(dataSourceName, done){
-      app.datasources[dataSourceName].automigrate(function(){
-        done();
-      });
+      var dataSource = app.datasources[dataSourceName];
+
+      if (Array.isArray(fixtures)) {
+        // build modelNames and modelNamesLower as a bit of hack
+        // to ensure we migrate the correct model name.
+        // its not possible to figure out which is the correct
+        // (lower or upper case) and automigrate doesn't do anything
+        // if the case is incorrect.
+        var modelNames = fixtures.map(function(fixture) {
+          return fixture.replace('.json', '');
+        });
+        var modelNamesLower = modelNames.map(function(modelName) {
+          return modelName.toLowerCase();
+        });
+        var modelNamesBothCases = modelNames.concat(modelNamesLower);
+
+        var remigrateModel = function(model, done) {
+          dataSource.automigrate(model, done);
+        }
+        async.each(modelNamesBothCases, remigrateModel, done);
+      } else {
+        dataSource.automigrate(done);
+      }
     };
+
     async.each(dataSourceNames, migrateDataSource, function(){
       callback(null, 'teardown complete');
     });
