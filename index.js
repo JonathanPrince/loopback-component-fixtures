@@ -62,8 +62,12 @@ module.exports = function setupTestFixtures(app, options) {
 
   Fixtures.setupFixtures = app.setupFixtures = function(opts, callback){
     if (!callback) callback = opts;
-    loadFixtures(app.models, options.fixturesPath, function(){
-      callback(null, 'setup complete');
+    loadFixtures(app.models, options.fixturesPath, function(errors){
+      if (errors) {
+        callback(errors);
+      } else {
+        callback(null, 'setup complete');
+      }
     });
   };
 

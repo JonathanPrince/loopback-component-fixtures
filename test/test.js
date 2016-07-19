@@ -1,12 +1,24 @@
 var request = require('supertest');
-var loopback = require('loopback');
 var expect = require('chai').expect;
-var fixturesComponent = require('../');
+var fixturesComponent;
+var loopback;
 var app;
 var Item;
 
+// Forces a module to load from disk, preventing state from
+// carrying over from test to test
+function requireUncached(module) {
+    delete require.cache[require.resolve(module)];
+    return require(module);
+}
+
 describe('loopback fixtures component', function() {
   beforeEach(function() {
+    // Force a 'clean' loopback and fixtures component for each test
+    // Without this, the fixturesPath setting bleeds from test to test
+    fixturesComponent = requireUncached('../');
+    loopback = requireUncached('loopback');
+
     app = loopback();
     app.set('legacyExplorer', false);
 
@@ -17,6 +29,7 @@ describe('loopback fixtures component', function() {
 
     Item = dataSource.createModel('item', {
       id: {type: Number, id: true},
+      requiredStuff: {type: String, required: true},
       name: String,
       description: String
     });
@@ -139,7 +152,41 @@ describe('loopback fixtures component', function() {
   });
 
   describe('fixtures endpoints', function() {
-    describe('a GET request to /fixtures/setup', function() {
+    describe('a GET request to /fixtures/setup with invalid fixtures', function() {
+      it('should return failure message if fixtures are invalid', function(done) {
+        var options = {
+          'fixturesPath': 'test/test-fixtures-invalid/'
+        };
+        fixturesComponent(app, options);
+        request(app).get('/fixtures/setup')
+          .expect(500)
+          .end(function(err, res) {
+            expect(err).to.equal(null);
+            expect(res.body).to.be.an('Object');
+            expect(res.body.error).to.exist;
+            expect(res.body.error.details.length).to.equal(2);
+            done();
+          });
+      });
+
+      it('should not load fixtures', function(done) {
+        var options = {
+          'fixturesPath': 'test/test-fixtures-invalid/'
+        };
+        fixturesComponent(app, options);
+        request(app).get('/fixtures/setup').end(function() {
+          request(app).get('/items')
+            .expect(200)
+            .end(function(err, res) {
+              expect(err).to.equal(null);
+              expect(res.body).to.be.an('Array');
+              expect(res.body.length).to.equal(0);
+              done();
+            });
+        });
+      });
+    });
+    describe('a GET request to /fixtures/setup with valid fixtures', function() {
       it('should return success message', function(done) {
         var options = {
           'fixturesPath': 'test/test-fixtures/'
