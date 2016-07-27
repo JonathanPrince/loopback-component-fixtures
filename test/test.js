@@ -114,6 +114,50 @@ describe('loopback fixtures component', function() {
         });
     });
 
+    it('should load in start fixtures because no app env setting is set', function(done) {
+
+      delete app.settings.env;
+
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/',
+        'environments': process.env.NODE_ENV
+      };
+
+      fixturesComponent(app, options);
+
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(2);
+          done();
+        });
+    });
+
+    it('should load in start fixtures because no app env setting is set (as array)', function(done) {
+
+      delete app.settings.env;
+
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures/',
+        'environments': [process.env.NODE_ENV]
+      };
+
+      fixturesComponent(app, options);
+
+      request(app).get('/items')
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.equal(null);
+          expect(res.body).to.be.an('Array');
+          expect(res.body.length).to.equal(2);
+          done();
+        });
+    });
+
     it('should load in start fixtures because of env matches (as array)', function(done) {
 
       app.settings.env = 'env';
@@ -136,6 +180,24 @@ describe('loopback fixtures component', function() {
         });
     });
 
+    it('should not throw an error if fixtures fail to load on startup', function() {
+      var options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures-invalid/'
+      };
+      expect(fixturesComponent.bind(this, app, options)).to.not.throw();
+    });
+
+    it('should throw an error if fixtures fail to load on startup and errors are enabled', function() {
+      var options = {
+        'loadFixturesOnStartup': true,
+        'errorOnSetupFailure': true,
+        'fixturesPath': 'test/test-fixtures-invalid/'
+      };
+      expect(fixturesComponent.bind(this, app, options)).to.throw();
+    });
+
+
     it('shouldn\'t load files without .json extension', function(done) {
       var options = {
         'loadFixturesOnStartup': true,
@@ -153,9 +215,23 @@ describe('loopback fixtures component', function() {
 
   describe('fixtures endpoints', function() {
     describe('a GET request to /fixtures/setup with invalid fixtures', function() {
-      it('should return failure message if fixtures are invalid', function(done) {
+      it('should return OK message when when errors are not enabled', function(done) {
         var options = {
-          'fixturesPath': 'test/test-fixtures-invalid/'
+          'fixturesPath': 'test/test-fixtures-invalid/',
+          'errorOnSetupFailure': false
+        };
+        fixturesComponent(app, options);
+        request(app).get('/fixtures/setup')
+          .expect(200)
+          .end(function(err, res) {
+            expect(err).to.equal(null);
+            done();
+          });
+      });
+      it('should return failure message when when errors are enabled', function(done) {
+        var options = {
+          'fixturesPath': 'test/test-fixtures-invalid/',
+          'errorOnSetupFailure': true
         };
         fixturesComponent(app, options);
         request(app).get('/fixtures/setup')
@@ -221,6 +297,7 @@ describe('loopback fixtures component', function() {
     });
 
     describe('a GET request to /fixtures/teardown', function() {
+
       it('should return success message', function(done) {
         var options = {
           'fixturesPath': 'test/test-fixtures/'
@@ -239,6 +316,22 @@ describe('loopback fixtures component', function() {
       it('should teardown fixtures', function(done) {
         var options = {
           'loadFixturesOnStartup': true,
+          'fixturesPath': 'test/test-fixtures/'
+        };
+        fixturesComponent(app, options);
+        request(app).get('/fixtures/teardown')
+          .end(function(err, res) {
+            expect(err).to.equal(null);
+            app.models.Item.find(function(err, data) {
+              expect(data.length).to.equal(0);
+              done();
+            });
+          });
+      });
+
+      it('should teardown fixtures even when none were setup', function(done) {
+        var options = {
+          'loadFixturesOnStartup': false,
           'fixturesPath': 'test/test-fixtures/'
         };
         fixturesComponent(app, options);

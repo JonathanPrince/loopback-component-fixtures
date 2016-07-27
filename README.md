@@ -43,6 +43,18 @@ Options:
 
   [Boolean] : Defines whether the fixture data should be loaded on startup. *(default: false)*
 
+ - `errorOnSetupFailure`
+
+  [Boolean] : Defines whether the API shows/throws an error when fixtures fail to load.  *(default: true)*
+
+  If **true**:
+    - Bad fixtures loaded on startup will cause the application to fail with an error.
+    - Bad fixtures loaded via the REST endpoint will return a `500` status code and an `error` object with details about the specific fixture failures.
+
+  If **false**:
+    - App will continue running (but log an error) if bad fixtures are loaded on startup
+    - App will return a 200 with no error details if bad fixtures are loaded when calling the fixture setup REST endpoint, but will log an error to the console.
+
  - `environments`
 
   [String/Array] : The name(s) of the environment(s) where the fixtures should be used. *(default: 'test')*
