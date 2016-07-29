@@ -52,7 +52,7 @@ module.exports = function setupTestFixtures(app, options) {
     loadFixturesOnStartup: false,
     errorOnSetupFailure: false,
     environments: 'test',
-    fixturesPath: '/server/test-fixtures/',
+    fixturesPath: '/server/test-fixtures/'
   }, options);
 
   debug('Loading fixtures with options', options);
@@ -171,5 +171,4 @@ module.exports = function setupTestFixtures(app, options) {
     returns: {arg: 'fixtures', type: 'string'},
     http: {path: '/teardown', verb: 'get'}
   });
-
 };
