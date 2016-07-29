@@ -4,7 +4,9 @@
   "description": "Component for handling fixture data for client side tests",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/**/*.js"
+    "test": "npm run cover && npm run assert_coverage_thresholds",
+    "cover": "NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- test",
+    "assert_coverage_thresholds": "istanbul check-coverage --statement -90 --branch -85 --function 100 --lines 90"
   },
   "repository": {
     "type": "git",
@@ -20,12 +22,14 @@
   "license": "MIT",
   "dependencies": {
     "async": "^1.4.2",
+    "debug": "^2.2.0",
     "loopback": "^2.22.2",
     "loopback-datasource-juggler": "^2.41.0",
     "merge": "^1.2.0"
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "istanbul": "^0.4.4",
     "mocha": "^2.3.3",
     "supertest": "^1.1.0"
   }
