@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run cover && npm run assert_coverage_thresholds",
     "cover": "NODE_ENV=test istanbul cover node_modules/.bin/_mocha -- test",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "assert_coverage_thresholds": "istanbul check-coverage --statement -90 --branch -85 --function 100 --lines 90"
   },
   "repository": {
