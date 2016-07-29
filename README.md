@@ -48,7 +48,7 @@ Options:
 
  - `errorOnSetupFailure`
 
-  [Boolean] : Defines whether the API shows/throws an error when fixtures fail to load.  *(default: true)*
+  [Boolean] : Defines whether the API shows/throws an error when fixtures fail to load.  *(default: false)*
 
   If **true**:
     - Bad fixtures loaded on startup will cause the application to fail with an error.
