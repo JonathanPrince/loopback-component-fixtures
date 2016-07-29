@@ -1,4 +1,7 @@
 # loopback-component-fixtures
+[![Build Status](https://travis-ci.org/JonathanPrince/loopback-component-fixtures.svg?branch=master)](https://travis-ci.org/JonathanPrince/loopback-component-fixtures)
+[![Coverage Status](https://coveralls.io/repos/github/JonathanPrince/loopback-component-fixtures/badge.svg)](https://coveralls.io/github/JonathanPrince/loopback-component-fixtures)
+
 This component was conceived by the desire to test client side applications without needing to mock API requests. It doesn't make sense to mock an API when Loopback is already being used. Environment specific datasource configurations were already available, the only piece missing was an easy way to add and remove fixtures when required. Hopefully this component will be useful for others as well, if you have any suggestions to improve the usefulness of this component please let me know, or even better feel free to submit a pull request.
 
 # Usage
@@ -45,7 +48,7 @@ Options:
 
  - `errorOnSetupFailure`
 
-  [Boolean] : Defines whether the API shows/throws an error when fixtures fail to load.  *(default: true)*
+  [Boolean] : Defines whether the API shows/throws an error when fixtures fail to load.  *(default: false)*
 
   If **true**:
     - Bad fixtures loaded on startup will cause the application to fail with an error.
