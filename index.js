@@ -10,32 +10,33 @@ const debug = DebugGenerator('loopback:component:fixtures:')
 const debugSetup = DebugGenerator('loopback:component:fixtures:setup:verbose:')
 const debugTeardown = DebugGenerator('loopback:component:fixtures:teardown:verbose:')
 
+let models
 let fixtures
 let fixturePath
 let cachedFixtures
 
-const loadFixtures = (models, fixturesPath, cb) => {
-  const loadFixture = (fixture, done) => {
-    debugSetup('Loading fixture', fixture)
+const loadFixture = (fixture, done) => {
+  debugSetup('Loading fixture', fixture)
 
-    if (!cachedFixtures[fixture]) {
-      debugSetup('Fixture not cached loading from disk')
-      const fixtureData = require(fixturePath + fixture)
-      cachedFixtures[fixture] = fixtureData
-    }
-
-    const fixtureName = fixture.replace('.json', '')
-    debugSetup('Loading fixtures for', fixtureName)
-    models[fixtureName].create(cachedFixtures[fixture], (err) => {
-      if (err) {
-        debugSetup('Error when attempting to add fixtures for', fixture)
-        debugSetup(err)
-      }
-
-      done(err)
-    })
+  if (!cachedFixtures[fixture]) {
+    debugSetup('Fixture not cached loading from disk')
+    const fixtureData = require(fixturePath + fixture)
+    cachedFixtures[fixture] = fixtureData
   }
 
+  const fixtureName = fixture.replace('.json', '')
+  debugSetup('Loading fixtures for', fixtureName)
+  models[fixtureName].create(cachedFixtures[fixture], (err) => {
+    if (err) {
+      debugSetup('Error when attempting to add fixtures for', fixture)
+      debugSetup(err)
+    }
+
+    done(err)
+  })
+}
+
+const loadFixtures = (fixturesPath, cb) => {
   if (!cachedFixtures) {
     debugSetup('No cached fixtures loading fixture files from', fixturePath)
     cachedFixtures = {}
@@ -57,6 +58,8 @@ const setupTestFixtures = (app, options) => {
 
   debug('Loading fixtures with options', options)
 
+  models = app.models
+
   const environment = app.settings && app.settings.env
     ? app.settings.env : process.env.NODE_ENV
 
@@ -70,7 +73,7 @@ const setupTestFixtures = (app, options) => {
   }
 
   if (options.loadFixturesOnStartup) {
-    loadFixtures(app.models, options.fixturesPath, (err) => {
+    loadFixtures(options.fixturesPath, (err) => {
       if (err) debug('Error when loading fixtures on startup:', err)
       if (err && options.errorOnSetupFailure) {
         throw new Error('Failed to load fixtures on startup:', err)
@@ -87,7 +90,7 @@ const setupTestFixtures = (app, options) => {
     /* istanbul ignore else */
     if (!cb) cb = opts
     debug('Loading fixtures')
-    loadFixtures(app.models, options.fixturesPath, (errors) => {
+    loadFixtures(options.fixturesPath, (errors) => {
       if (errors) debug('Fixtures failed to load:', errors)
       if (errors && options.errorOnSetupFailure) return cb(errors)
 
@@ -105,11 +108,10 @@ const setupTestFixtures = (app, options) => {
       const dataSource = app.datasources[dataSourceName]
 
       if (Array.isArray(fixtures)) {
-        // build modelNames and modelNamesLower as a bit of hack
-        // to ensure we migrate the correct model name.
-        // its not possible to figure out which is the correct
-        // (lower or upper case) and automigrate doesn't do anything
-        // if the case is incorrect.
+        // build modelNames and modelNamesLower as a bit of hack to ensure we
+        // migrate the correct model name. its not possible to figure out
+        // which is the correct (lower or upper case) and automigrate doesn't
+        // do anything if the case is incorrect.
         const modelNames = fixtures.map(fixture => fixture.replace('.json', ''))
         const modelNamesLower = modelNames.map(modelName => modelName.toLowerCase())
         const modelNamesBothCases = modelNames.concat(modelNamesLower)
