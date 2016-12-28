@@ -65,7 +65,7 @@ module.exports = function setupTestFixtures(app, options) {
     : environment === options.environments;
 
   if (!match) {
-    debug('Skipping fixtures because environment', environment, 'is not in options.enviornments');
+    debug('Skipping fixtures because environment', environment, 'is not in options.environments');
     return;
   }
 
@@ -80,7 +80,7 @@ module.exports = function setupTestFixtures(app, options) {
     });
   }
 
-  var Fixtures = app.model('fixtures', {
+  var Fixtures = app.model('Fixtures', {
     dataSource: false,
     base: 'Model'
   });
