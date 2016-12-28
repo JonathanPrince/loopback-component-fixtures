@@ -19,7 +19,7 @@
     "fixtures",
     "testing"
   ],
-  "author": "",
+  "author": "Jonathan Prince <jonathan.prince@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "async": "^1.4.2",
