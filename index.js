@@ -1,5 +1,6 @@
 var fs =  require('fs');
 var path = require('path');
+var appRoot = require('app-root-path').path;
 var async = require('async');
 var loopback = require('loopback');
 var merge = require('merge');
@@ -36,7 +37,7 @@ function loadFixtures(models, fixturesPath, callback) {
   if (!cachedFixtures) {
     debugSetup('No cached fixtures; loading fixture files from', fixturePath);
     cachedFixtures = {}
-    var fixturePath = path.join(process.cwd(), fixturesPath);
+    var fixturePath = path.join(appRoot, fixturesPath);
     var fixtureFolderContents = fs.readdirSync(fixturePath);
     fixtures = fixtureFolderContents.filter(function(fileName){
       return fileName.match(/\.json$/);
