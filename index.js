@@ -11,24 +11,23 @@ const debugSetup = DebugGenerator('loopback:component:fixtures:setup:verbose:')
 const debugTeardown = DebugGenerator('loopback:component:fixtures:teardown:verbose:')
 
 let models
-let fixtures
+let fixtureNames
 let fixturePath
 let cachedFixtures
 
-const loadFixture = (fixture, done) => {
-  debugSetup('Loading fixture', fixture)
+const loadFixture = (fixtureName, done) => {
+  debugSetup('Loading fixture', fixtureName)
 
-  if (!cachedFixtures[fixture]) {
+  if (!cachedFixtures[fixtureName]) {
     debugSetup('Fixture not cached loading from disk')
-    const fixtureData = require(fixturePath + fixture)
-    cachedFixtures[fixture] = fixtureData
+    const fixtureData = require(fixturePath + fixtureName)
+    cachedFixtures[fixtureName] = fixtureData
   }
 
-  const fixtureName = fixture.replace('.json', '')
   debugSetup('Loading fixtures for', fixtureName)
-  models[fixtureName].create(cachedFixtures[fixture], (err) => {
+  models[fixtureName].create(cachedFixtures[fixtureName], (err) => {
     if (err) {
-      debugSetup('Error when attempting to add fixtures for', fixture)
+      debugSetup('Error when attempting to add fixtures for', fixtureName)
       debugSetup(err)
     }
 
@@ -42,10 +41,12 @@ const loadFixtures = (fixturesPath, cb) => {
     cachedFixtures = {}
     fixturePath = path.join(appRoot, fixturesPath)
     const fixtureFolderContents = fs.readdirSync(fixturePath)
-    fixtures = fixtureFolderContents.filter(fileName => fileName.match(/\.json$/))
+    fixtureNames = fixtureFolderContents
+      .filter(fileName => fileName.match(/\.json$/))
+      .map(fileName => fileName.replace('.json', ''))
   }
 
-  async.each(fixtures, loadFixture, cb)
+  async.each(fixtureNames, loadFixture, cb)
 }
 
 const setupTestFixtures = (app, options) => {
@@ -107,14 +108,13 @@ const setupTestFixtures = (app, options) => {
       debugTeardown('Tearing down fixtures for', dataSourceName)
       const dataSource = app.datasources[dataSourceName]
 
-      if (Array.isArray(fixtures)) {
+      if (Array.isArray(fixtureNames)) {
         // build modelNames and modelNamesLower as a bit of hack to ensure we
         // migrate the correct model name. its not possible to figure out
         // which is the correct (lower or upper case) and automigrate doesn't
         // do anything if the case is incorrect.
-        const modelNames = fixtures.map(fixture => fixture.replace('.json', ''))
-        const modelNamesLower = modelNames.map(modelName => modelName.toLowerCase())
-        const modelNamesBothCases = modelNames.concat(modelNamesLower)
+        const modelNamesLower = fixtureNames.map(modelName => modelName.toLowerCase())
+        const modelNamesBothCases = fixtureNames.concat(modelNamesLower)
         const remigrateModel = (model, done) => {
           debugTeardown('Dropping model', model, 'from', dataSourceName)
           dataSource.automigrate(model, (err) => {
