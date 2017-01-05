@@ -81,7 +81,9 @@ const setupTestFixtures = (app, options) => {
     })
   }
 
-  const Fixtures = app.model('Fixtures', {
+  const Fixtures = app.registry.createModel({name: 'Fixtures', base: 'Model'})
+
+  app.model(Fixtures, {
     dataSource: false,
     base: 'Model'
   })
