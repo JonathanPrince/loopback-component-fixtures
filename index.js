@@ -35,7 +35,7 @@ const loadFixture = (fixtureName, done) => {
   })
 }
 
-const loadFixtures = (fixturesPath, cb) => {
+const loadFixtures = (fixturesPath, fixtures, cb) => {
   if (!cachedFixtures) {
     debugSetup('No cached fixtures loading fixture files from', fixturePath)
     cachedFixtures = {}
@@ -46,7 +46,12 @@ const loadFixtures = (fixturesPath, cb) => {
       .map(fileName => fileName.replace('.json', ''))
   }
 
-  async.each(fixtureNames, loadFixture, cb)
+  if (!cb) {
+    cb = fixtures
+    async.each(fixtureNames, loadFixture, cb)
+  } else {
+    async.each(fixtures, loadFixture, cb)
+  }
 }
 
 const setupTestFixtures = (app, options) => {
@@ -82,26 +87,41 @@ const setupTestFixtures = (app, options) => {
     })
   }
 
-  const Fixtures = app.model('Fixtures', {
+  const Fixtures = app.registry.createModel({name: 'Fixtures', base: 'Model'})
+
+  app.model(Fixtures, {
     dataSource: false,
     base: 'Model'
   })
 
   Fixtures.setupFixtures = app.setupFixtures = (opts, cb) => {
-    /* istanbul ignore else */
-    if (!cb) cb = opts
     debug('Loading fixtures')
-    loadFixtures(options.fixturesPath, (errors) => {
+    const setupCallback = (errors) => {
       if (errors) debug('Fixtures failed to load:', errors)
       if (errors && options.errorOnSetupFailure) return cb(errors)
 
       cb(null, 'setup complete')
-    })
+    }
+    if (!cb) {
+      cb = opts
+      debugSetup('Loading all fixtures in folder')
+      loadFixtures(options.fixturesPath, setupCallback)
+    } else {
+      if (!Array.isArray(opts)) opts = [opts]
+      debugSetup('Loading following fixtures: ', opts)
+      loadFixtures(options.fixturesPath, opts, setupCallback)
+    }
   }
 
   Fixtures.teardownFixtures = app.teardownFixtures = (opts, cb) => {
-    /* istanbul ignore else */
-    if (!cb) cb = opts
+    let fixturesToTeardown
+    if (!cb) {
+      cb = opts
+      fixturesToTeardown = fixtureNames
+    } else {
+      if (!Array.isArray(opts)) opts = [opts]
+      fixturesToTeardown = opts
+    }
     debugTeardown('Tearing down fixtures for', Object.keys(app.datasources))
     const dataSourceNames = Object.keys(app.datasources)
     const migrateDataSource = (dataSourceName, done) => {
@@ -113,8 +133,8 @@ const setupTestFixtures = (app, options) => {
         // migrate the correct model name. its not possible to figure out
         // which is the correct (lower or upper case) and automigrate doesn't
         // do anything if the case is incorrect.
-        const modelNamesLower = fixtureNames.map(modelName => modelName.toLowerCase())
-        const modelNamesBothCases = fixtureNames.concat(modelNamesLower)
+        const modelNamesLower = fixturesToTeardown.map(modelName => modelName.toLowerCase())
+        const modelNamesBothCases = fixturesToTeardown.concat(modelNamesLower)
         const remigrateModel = (model, done) => {
           debugTeardown('Dropping model', model, 'from', dataSourceName)
           dataSource.automigrate(model, (err) => {
