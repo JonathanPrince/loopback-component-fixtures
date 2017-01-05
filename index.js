@@ -96,8 +96,8 @@ const setupTestFixtures = (app, options) => {
     base: 'Model'
   })
 
-  Fixtures.setupFixtures = app.setupFixtures = (opts, cb) => {
-    if (typeof opts === 'function') cb = opts
+  Fixtures.setupFixtures = app.setupFixtures = (select, cb) => {
+    if (typeof select === 'function') cb = select
     debug('Loading fixtures')
     const setupCallback = (errors) => {
       if (errors) debug('Fixtures failed to load:', errors)
@@ -105,26 +105,26 @@ const setupTestFixtures = (app, options) => {
 
       cb(null, 'setup complete')
     }
-    if (typeof opts !== 'string') {
+    if (typeof select !== 'string') {
       debugSetup('Loading all fixtures in folder')
       loadFixtures(options.fixturesPath, setupCallback)
     } else {
       /* istanbul ignore else */
-      if (!Array.isArray(opts)) opts = opts.split(',')
-      debugSetup('Loading following fixtures: ', opts)
-      loadFixtures(options.fixturesPath, opts, setupCallback)
+      if (!Array.isArray(select)) select = select.split(',')
+      debugSetup('Loading following fixtures: ', select)
+      loadFixtures(options.fixturesPath, select, setupCallback)
     }
   }
 
-  Fixtures.teardownFixtures = app.teardownFixtures = (opts, cb) => {
-    if (typeof opts === 'function') cb = opts
+  Fixtures.teardownFixtures = app.teardownFixtures = (select, cb) => {
+    if (typeof select === 'function') cb = select
     let fixturesToTeardown
-    if (typeof opts !== 'string') {
+    if (typeof select !== 'string') {
       fixturesToTeardown = fixtureNames
     } else {
       /* istanbul ignore else */
-      if (!Array.isArray(opts)) opts = opts.split(',')
-      fixturesToTeardown = opts
+      if (!Array.isArray(select)) select = select.split(',')
+      fixturesToTeardown = select
     }
     debugTeardown('Tearing down fixtures for', Object.keys(app.datasources))
     const dataSourceNames = Object.keys(app.datasources)
@@ -177,14 +177,14 @@ const setupTestFixtures = (app, options) => {
 
   Fixtures.remoteMethod('setupFixtures', {
     description: 'Setup fixtures',
-    accepts: {arg: 'opts', type: 'string', http: { source: 'query' }},
+    accepts: {arg: 'select', type: 'string', http: { source: 'query' }},
     returns: {arg: 'fixtures', type: 'string'},
     http: {path: '/setup', verb: 'get'}
   })
 
   Fixtures.remoteMethod('teardownFixtures', {
     description: 'Teardown fixtures',
-    accepts: {arg: 'opts', type: 'string', http: { source: 'query' }},
+    accepts: {arg: 'select', type: 'string', http: { source: 'query' }},
     returns: {arg: 'fixtures', type: 'string'},
     http: {path: '/teardown', verb: 'get'}
   })
