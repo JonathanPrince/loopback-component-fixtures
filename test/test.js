@@ -409,6 +409,54 @@ describe('loopback fixtures component', function () {
             })
         })
       })
+
+      it('should load selected fixture', function (done) {
+        const options = {
+          'fixturesPath': 'test/test-fixtures/'
+        }
+
+        fixturesComponent(app, options)
+
+        request(app).get('/fixtures/setup?opts=Item2').end(function () {
+          request(app).get('/items')
+            .expect(200)
+            .end(function (err, res) {
+              expect(err).to.be.null
+              expect(res.body.length).to.equal(0)
+              request(app).get('/item2s')
+                .expect(200)
+                .end(function (err, res) {
+                  expect(err).to.be.null
+                  expect(res.body.length).to.equal(2)
+                  done()
+                })
+            })
+        })
+      })
+
+      it('should load a selection of fixtures', function (done) {
+        const options = {
+          'fixturesPath': 'test/test-fixtures/'
+        }
+
+        fixturesComponent(app, options)
+
+        request(app).get('/fixtures/setup?opts=Item2,Item').end(function () {
+          request(app).get('/items')
+            .expect(200)
+            .end(function (err, res) {
+              expect(err).to.be.null
+              expect(res.body.length).to.equal(2)
+              request(app).get('/item2s')
+                .expect(200)
+                .end(function (err, res) {
+                  expect(err).to.be.null
+                  expect(res.body.length).to.equal(2)
+                  done()
+                })
+            })
+        })
+      })
     })
 
     describe('a GET request to /fixtures/teardown', function () {
@@ -446,6 +494,56 @@ describe('loopback fixtures component', function () {
               done()
             })
           })
+      })
+
+      it('should teardown a selected fixture', function (done) {
+        const options = {
+          'loadFixturesOnStartup': true,
+          'fixturesPath': 'test/test-fixtures/'
+        }
+
+        fixturesComponent(app, options)
+
+        request(app).get('/fixtures/teardown?opts=Item2').end(function () {
+          request(app).get('/items')
+            .expect(200)
+            .end(function (err, res) {
+              expect(err).to.be.null
+              expect(res.body.length).to.equal(2)
+              request(app).get('/item2s')
+                .expect(200)
+                .end(function (err, res) {
+                  expect(err).to.be.null
+                  expect(res.body.length).to.equal(0)
+                  done()
+                })
+            })
+        })
+      })
+
+      it('should teardwon a selection of fixtures', function (done) {
+        const options = {
+          'loadFixturesOnStartup': true,
+          'fixturesPath': 'test/test-fixtures/'
+        }
+
+        fixturesComponent(app, options)
+
+        request(app).get('/fixtures/teardown?opts=Item2,Item').end(function () {
+          request(app).get('/items')
+            .expect(200)
+            .end(function (err, res) {
+              expect(err).to.be.null
+              expect(res.body.length).to.equal(0)
+              request(app).get('/item2s')
+                .expect(200)
+                .end(function (err, res) {
+                  expect(err).to.be.null
+                  expect(res.body.length).to.equal(0)
+                  done()
+                })
+            })
+        })
       })
 
       it('should teardown fixtures even when none were setup', function (done) {
