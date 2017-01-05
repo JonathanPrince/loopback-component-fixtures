@@ -18,6 +18,7 @@ let cachedFixtures
 const loadFixture = (fixtureName, done) => {
   debugSetup('Loading fixture', fixtureName)
 
+  /* istanbul ignore else */
   if (!cachedFixtures[fixtureName]) {
     debugSetup('Fixture not cached loading from disk')
     const fixtureData = require(fixturePath + fixtureName)
@@ -36,6 +37,7 @@ const loadFixture = (fixtureName, done) => {
 }
 
 const loadFixtures = (fixturesPath, fixtures, cb) => {
+  /* istanbul ignore else */
   if (!cachedFixtures) {
     debugSetup('No cached fixtures loading fixture files from', fixturePath)
     cachedFixtures = {}
@@ -107,6 +109,7 @@ const setupTestFixtures = (app, options) => {
       debugSetup('Loading all fixtures in folder')
       loadFixtures(options.fixturesPath, setupCallback)
     } else {
+      /* istanbul ignore else */
       if (!Array.isArray(opts)) opts = opts.split(',')
       debugSetup('Loading following fixtures: ', opts)
       loadFixtures(options.fixturesPath, opts, setupCallback)
@@ -119,6 +122,7 @@ const setupTestFixtures = (app, options) => {
     if (typeof opts !== 'string') {
       fixturesToTeardown = fixtureNames
     } else {
+      /* istanbul ignore else */
       if (!Array.isArray(opts)) opts = opts.split(',')
       fixturesToTeardown = opts
     }
