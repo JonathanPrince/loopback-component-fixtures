@@ -5,8 +5,6 @@ const expect = require('chai').expect
 let fixturesComponent
 let loopback
 let app
-let Item
-let Item2
 
 // Forces a module to load from disk, preventing state from
 // carrying over from test to test
@@ -30,13 +28,13 @@ describe('loopback fixtures component', function () {
       connector: 'memory'
     })
 
-    Item = dataSource.createModel('Item', {
+    const Item = dataSource.createModel('Item', {
       id: {type: Number, id: true},
       requiredStuff: {type: String, required: true},
       name: String,
       description: String
     })
-    Item2 = dataSource.createModel('Item2', {
+    const Item2 = dataSource.createModel('Item2', {
       id: {type: Number, id: true},
       requiredStuff: {type: String, required: true},
       name: String,
@@ -206,21 +204,14 @@ describe('loopback fixtures component', function () {
       expect(fixturesComponent.bind(this, app, options)).to.throw()
     })
 
-    // it('shouldn\'t load files without .json extension', function (done) {
-    //   const options = {
-    //     'loadFixturesOnStartup': true,
-    //     'fixturesPath': 'test/test-fixtures/'
-    //   }
-    //
-    //   fixturesComponent(app, options)
-    //
-    //   request(app).get('/DontLoadThis')
-    //     .expect(404)
-    //     .end(function (err, res) {
-    //       expect(err).to.be.null
-    //       done()
-    //     })
-    // })
+    it('should throw an error if there is a fixture file for an undefined model', function () {
+      const options = {
+        'loadFixturesOnStartup': true,
+        'fixturesPath': 'test/test-fixtures-undefined/'
+      }
+
+      expect(fixturesComponent.bind(this, app, options)).to.throw()
+    })
   })
 
   describe('fixtures methods', function () {
