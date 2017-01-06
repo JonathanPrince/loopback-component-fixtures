@@ -14,15 +14,33 @@ let models
 let fixtureNames
 let fixturePath
 let cachedFixtures
+let config
+
+const defaults = {
+  loadFixturesOnStartup: false,
+  errorOnSetupFailure: false,
+  environments: 'test',
+  fixturesPath: '/server/test-fixtures/'
+}
+
+const createFixtureList = () => {
+  const fixtureFolderContents = fs.readdirSync(fixturePath)
+  return fixtureFolderContents.filter(fileName => fileName.match(/\.json$/))
+    .map(fileName => fileName.replace('.json', ''))
+}
+
+const addToCache = (fixtureName) => {
+  const fixtureData = require(fixturePath + fixtureName)
+  cachedFixtures[fixtureName] = fixtureData
+}
 
 const loadFixture = (fixtureName, done) => {
   debugSetup('Loading fixture', fixtureName)
 
   /* istanbul ignore else */
   if (!cachedFixtures[fixtureName]) {
-    debugSetup('Fixture not cached loading from disk')
-    const fixtureData = require(fixturePath + fixtureName)
-    cachedFixtures[fixtureName] = fixtureData
+    debugSetup('Fixture not cached, loading from disk')
+    addToCache(fixtureName)
   }
 
   debugSetup('Loading fixtures for', fixtureName)
@@ -36,16 +54,12 @@ const loadFixture = (fixtureName, done) => {
   })
 }
 
-const loadFixtures = (fixturesPath, fixtures, cb) => {
+const loadFixtures = (fixtures, cb) => {
   /* istanbul ignore else */
   if (!cachedFixtures) {
     debugSetup('No cached fixtures loading fixture files from', fixturePath)
     cachedFixtures = {}
-    fixturePath = path.join(appRoot, fixturesPath)
-    const fixtureFolderContents = fs.readdirSync(fixturePath)
-    fixtureNames = fixtureFolderContents
-      .filter(fileName => fileName.match(/\.json$/))
-      .map(fileName => fileName.replace('.json', ''))
+    fixtureNames = createFixtureList()
   }
 
   if (!cb) {
@@ -56,39 +70,36 @@ const loadFixtures = (fixturesPath, fixtures, cb) => {
   }
 }
 
-const setupTestFixtures = (app, options) => {
-  options = merge({
-    loadFixturesOnStartup: false,
-    errorOnSetupFailure: false,
-    environments: 'test',
-    fixturesPath: '/server/test-fixtures/'
-  }, options)
-
-  debug('Loading fixtures with options', options)
-
+const init = (app, options) => {
   models = app.models
+  config = merge(defaults, options)
+  fixturePath = path.join(appRoot, config.fixturesPath)
+
+  debug('Initializing component with options', config)
 
   const environment = app.settings && app.settings.env
     ? app.settings.env : process.env.NODE_ENV
 
-  const match = Array.isArray(options.environments)
-    ? options.environments.indexOf(environment) !== -1
-    : environment === options.environments
+  const match = Array.isArray(config.environments)
+    ? config.environments.indexOf(environment) !== -1
+    : environment === config.environments
 
   if (!match) {
     debug('Skipping fixtures because environment', environment, 'is not in options.environments')
     return
   }
 
-  if (options.loadFixturesOnStartup) {
-    loadFixtures(options.fixturesPath, (err) => {
+  if (config.loadFixturesOnStartup) {
+    loadFixtures((err) => {
       if (err) debug('Error when loading fixtures on startup:', err)
-      if (err && options.errorOnSetupFailure) {
+      if (err && config.errorOnSetupFailure) {
         throw new Error('Failed to load fixtures on startup:', err)
       }
     })
   }
+}
 
+const setupInterface = (app) => {
   const Fixtures = app.registry.createModel({name: 'Fixtures', base: 'Model'})
 
   app.model(Fixtures, {
@@ -101,18 +112,18 @@ const setupTestFixtures = (app, options) => {
     debug('Loading fixtures')
     const setupCallback = (errors) => {
       if (errors) debug('Fixtures failed to load:', errors)
-      if (errors && options.errorOnSetupFailure) return cb(errors)
+      if (errors && config.errorOnSetupFailure) return cb(errors)
 
       cb(null, 'setup complete')
     }
     if (typeof select !== 'string') {
       debugSetup('Loading all fixtures in folder')
-      loadFixtures(options.fixturesPath, setupCallback)
+      loadFixtures(setupCallback)
     } else {
       /* istanbul ignore else */
       if (!Array.isArray(select)) select = select.split(',')
       debugSetup('Loading following fixtures: ', select)
-      loadFixtures(options.fixturesPath, select, setupCallback)
+      loadFixtures(select, setupCallback)
     }
   }
 
@@ -190,4 +201,7 @@ const setupTestFixtures = (app, options) => {
   })
 }
 
-module.exports = setupTestFixtures
+module.exports = (app, options) => {
+  init(app, options)
+  setupInterface(app)
+}
