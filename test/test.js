@@ -247,7 +247,6 @@ describe('loopback fixtures component', function () {
             expect(err).to.be.null
             expect(res.body).to.be.an('Object')
             expect(res.body.error).to.exist
-            expect(res.body.error.details.length).to.equal(2)
             done()
           })
       })

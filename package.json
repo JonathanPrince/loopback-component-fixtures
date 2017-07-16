@@ -23,16 +23,15 @@
   "license": "MIT",
   "dependencies": {
     "app-root-path": "^2.0.1",
-    "async": "^1.4.2",
+    "async": "^2.5.0",
     "debug": "^2.2.0",
-    "loopback": "^2.22.2",
-    "loopback-datasource-juggler": "^2.41.0",
     "merge": "^1.2.0"
   },
   "devDependencies": {
-    "chai": "^3.3.0",
+    "chai": "^4.1.0",
     "istanbul": "^0.4.4",
-    "mocha": "^2.3.3",
-    "supertest": "^1.1.0"
+    "loopback": "^3.9.0",
+    "mocha": "^3.4.2",
+    "supertest": "^3.0.0"
   }
 }
